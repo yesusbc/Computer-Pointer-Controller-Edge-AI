@@ -10,7 +10,6 @@ import sys
 import logging as log
 from openvino.inference_engine import IECore
 import cv2
-import numpy as np
 
 EXTENSIONS_PATH = "/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
 LANDMARKS_MODEL_PATH = "../intel_models/landmarks-regression-retail-0009/FP32/landmarks-regression-retail-0009"
@@ -18,7 +17,7 @@ LANDMARKS_MODEL_PATH = "../intel_models/landmarks-regression-retail-0009/FP32/la
 
 class LandmarksDetectionModel:
     """
-    Class for the Face Detection Model.
+    Class for the landmarks Detection Model.
     """
     def __init__(self, model_path=LANDMARKS_MODEL_PATH, device="CPU", extensions=None):
         """
@@ -82,7 +81,7 @@ class LandmarksDetectionModel:
         self.w = image.shape[1]
         self.h = image.shape[0]
         p_frame = self.preprocess_input(image)
-        outputs = self.exec_net.infer({self.input_name : p_frame})
+        outputs = self.exec_net.infer({self.input_name: p_frame})
         left_eye, right_eye = self.preprocess_outputs(outputs[self.output_name])
 
         # Left eye coords and cropped image
@@ -115,7 +114,6 @@ class LandmarksDetectionModel:
 
     def preprocess_outputs(self, landmarks_vector):
         """
-        This function applies a probability threshold to the output data.
         The return will contain the related coordinates of the prediction, resized to the original image size
         """
         left_eye = (landmarks_vector[0][0][0][0]*self.w, landmarks_vector[0][1][0][0]*self.h)

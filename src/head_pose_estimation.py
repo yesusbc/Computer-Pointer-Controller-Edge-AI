@@ -12,6 +12,7 @@ import sys
 import logging as log
 from openvino.inference_engine import IECore
 import cv2
+import numpy as np
 
 EXTENSIONS_PATH = "/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
 FACE_MODEL_PATH = "../intel_models/head-pose-estimation-adas-0001/FP32/head-pose-estimation-adas-0001"
@@ -88,7 +89,8 @@ class HeadPoseDetectionModel:
         yaw = outputs[self.yaw_output_name][0][0]
         pitch = outputs[self.pitch_output_name][0][0]
         roll = outputs[self.roll_output_name][0][0]
-        return yaw, pitch, roll
+        head_pose_angles = [yaw, pitch, roll]
+        return head_pose_angles
 
     def preprocess_input(self, image):
         """

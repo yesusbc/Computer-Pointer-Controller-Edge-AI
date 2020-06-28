@@ -15,6 +15,8 @@ import cv2
 
 EXTENSIONS_PATH = "/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
 FACE_MODEL_PATH = "../intel_models/gaze-estimation-adas-0002/FP32/gaze-estimation-adas-0002"
+
+
 class GazeEstimationModel:
     """
     Class for the Gaze EStimation Model.
@@ -82,7 +84,7 @@ class GazeEstimationModel:
                                        "left_eye_image": p_left_eye,
                                        "right_eye_image": p_right_eye
                                        })
-        # x,y,z = self.preprocess_outputs(outputs[self.output_name])
+
         x = outputs[self.output_name][0][0]
         y = outputs[self.output_name][0][1]
         z = outputs[self.output_name][0][2]
@@ -100,9 +102,3 @@ class GazeEstimationModel:
         p_frame = p_frame.reshape(1, *p_frame.shape)
         return p_frame
 
-    def preprocess_output(self, outputs):
-        '''
-        Before feeding the output of this model to the next model,
-        you might have to preprocess the output. This function is where you can do that.
-        '''
-        raise NotImplementedError
