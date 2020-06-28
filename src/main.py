@@ -4,6 +4,7 @@ Main File
 
 from face_detection import FaceDetectionModel
 from facial_landmarks_detection import LandmarksDetectionModel
+from head_pose_estimation import HeadPoseDetectionModel
 from input_feeder import InputFeeder
 from mouse_controller import MouseController
 import argparse
@@ -48,10 +49,14 @@ def main():
     landmarks_model = LandmarksDetectionModel()
     landmarks_model.load_model()
 
+    headpose_model = HeadPoseDetectionModel()
+    headpose_model.load_model()
+
     feed.load_data()
     for batch in feed.next_batch():
         cropped_face, coords = face_model.predict(batch)
         landmarks_model.predict(cropped_face)
+        yaw, pitch, roll = headpose_model.predict(cropped_face)
         break
     feed.close()
 
