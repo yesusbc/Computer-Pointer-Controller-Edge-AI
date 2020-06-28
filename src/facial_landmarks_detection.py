@@ -98,6 +98,10 @@ class LandmarksDetectionModel:
         eyes_coords = [[(x_left_eye-15, y_left_eye-15), (x_left_eye+15, y_left_eye+15)],
                        [(x_right_eye-15, y_right_eye-15), (x_right_eye+15, y_right_eye+15)]]
 
+        cv2.rectangle(image, (eyes_coords[0][0][0], eyes_coords[0][0][1]),
+                      (eyes_coords[0][1][0], eyes_coords[0][1][1]), (255, 0, 0), 2)
+        cv2.rectangle(image, (eyes_coords[1][0][0], eyes_coords[1][0][1]),
+                      (eyes_coords[1][1][0], eyes_coords[1][1][1]), (255, 0, 0), 2)
         return cropped_left_eye, cropped_right_eye, eyes_coords
 
     def preprocess_input(self, image):

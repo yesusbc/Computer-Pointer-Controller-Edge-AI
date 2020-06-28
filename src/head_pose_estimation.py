@@ -90,6 +90,7 @@ class HeadPoseDetectionModel:
         pitch = outputs[self.pitch_output_name][0][0]
         roll = outputs[self.roll_output_name][0][0]
         head_pose_angles = [yaw, pitch, roll]
+        # TODO: Head Pose draw
         return head_pose_angles
 
     def preprocess_input(self, image):

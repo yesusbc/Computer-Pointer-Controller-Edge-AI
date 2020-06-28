@@ -10,7 +10,6 @@ from input_feeder import InputFeeder
 from mouse_controller import MouseController
 import argparse
 import cv2
-import numpy as np
 
 def get_args():
     '''
@@ -20,8 +19,7 @@ def get_args():
 
     c_desc = "CPU extension file location, if applicable"
     d_desc = "Device, if not CPU (GPU, FPGA, MYRIAD)"
-    i_desc = "The location of the input file"
-    mface_desc = "The location of the face model path"
+    i_desc = "The location of the input file, if cam just write None"
     p_desc = "Probability threshold"
     it_desc = "Input Type, video, cam, or image"
 
@@ -30,7 +28,6 @@ def get_args():
     optional = parser.add_argument_group('optional arguments')
 
     required.add_argument("-i", help=i_desc, required=True)
-    required.add_argument("-m", help=mface_desc, required=True)
     required.add_argument("-it", help=it_desc, required=True)
     optional.add_argument("-c", help=c_desc, default=None)
     optional.add_argument("-d", help=d_desc, default="CPU")
@@ -55,14 +52,26 @@ def main():
     headpose_model.load_model()
     gaze_model = GazeEstimationModel()
     gaze_model.load_model()
+    mouse = MouseController("medium", "fast")
 
     feed.load_data()
     for batch in feed.next_batch():
-        cropped_face, coords = face_model.predict(batch)
-        left_eye, right_eye, _ = landmarks_model.predict(cropped_face)
-        head_pose_angles = headpose_model.predict(cropped_face)
-        x, y, z = gaze_model.predict(left_eye, right_eye, head_pose_angles)
-        break
+        try:
+            cropped_face, coords = face_model.predict(batch)
+            cv2.rectangle(batch, (coords[0], coords[1]), (coords[2], coords[3]), (255,0,0), 2)
+
+            left_eye, right_eye, eyes_coords = landmarks_model.predict(cropped_face)
+
+            head_pose_angles = headpose_model.predict(cropped_face)
+            x, y, z = gaze_model.predict(left_eye, right_eye, head_pose_angles, cropped_face, eyes_coords)
+
+            mouse.move(x, y)
+
+            cv2.imshow("img", batch)
+            if cv2.waitKey(25) & 0xFF == ord('q'):
+                break
+        except:
+            print("Frame without prediction")
     feed.close()
 
 

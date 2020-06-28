@@ -12,6 +12,7 @@ import sys
 import logging as log
 from openvino.inference_engine import IECore
 import cv2
+import math
 
 EXTENSIONS_PATH = "/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
 FACE_MODEL_PATH = "../intel_models/gaze-estimation-adas-0002/FP32/gaze-estimation-adas-0002"
@@ -74,7 +75,7 @@ class GazeEstimationModel:
         # Load the IENetwork into the plugin
         self.exec_net = self.ie.load_network(self.net, self.device, num_requests=1)
 
-    def predict(self, left_eye, right_eye, head_pose_angles):
+    def predict(self, left_eye, right_eye, head_pose_angles, cropped_face, eyes_coords):
         """
         Make inference over the exectutable network
         """
@@ -85,9 +86,22 @@ class GazeEstimationModel:
                                        "right_eye_image": p_right_eye
                                        })
 
-        x = outputs[self.output_name][0][0]
-        y = outputs[self.output_name][0][1]
+        x = round(outputs[self.output_name][0][0], 4)
+        y = round(outputs[self.output_name][0][1], 4)
         z = outputs[self.output_name][0][2]
+
+        center_x_left_eye = int((eyes_coords[0][1][0] - eyes_coords[0][0][0])/2 + eyes_coords[0][0][0])
+        center_y_left_eye = int((eyes_coords[0][1][1] - eyes_coords[0][0][1])/2 + eyes_coords[0][0][1])
+        new_x_left_eye = int(center_x_left_eye + x*40)
+        new_y_left_eye = int(center_y_left_eye + y*40*-1)
+        cv2.line(cropped_face, (center_x_left_eye, center_y_left_eye), (new_x_left_eye, new_y_left_eye), (0, 255, 0), 2)
+
+        center_x_right_eye = int((eyes_coords[1][1][0] - eyes_coords[1][0][0])/2 + eyes_coords[1][0][0])
+        center_y_right_eye = int((eyes_coords[1][1][1] - eyes_coords[1][0][1])/2 + eyes_coords[1][0][1])
+        new_x_right_eye = int(center_x_right_eye + x*40)
+        new_y_right_eye = int(center_y_right_eye + y*40*-1)
+        cv2.line(cropped_face, (center_x_right_eye, center_y_right_eye), (new_x_right_eye, new_y_right_eye), (0, 255, 0), 2)
+
         return x, y, z
 
     def preprocess_input(self, image):
