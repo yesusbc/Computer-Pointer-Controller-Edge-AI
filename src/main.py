@@ -5,10 +5,12 @@ Main File
 from face_detection import FaceDetectionModel
 from facial_landmarks_detection import LandmarksDetectionModel
 from head_pose_estimation import HeadPoseDetectionModel
+from gaze_estimation import GazeEstimationModel
 from input_feeder import InputFeeder
 from mouse_controller import MouseController
 import argparse
 import cv2
+import numpy as np
 
 def get_args():
     '''
@@ -51,12 +53,15 @@ def main():
 
     headpose_model = HeadPoseDetectionModel()
     headpose_model.load_model()
+    gaze_model = GazeEstimationModel()
+    gaze_model.load_model()
 
     feed.load_data()
     for batch in feed.next_batch():
         cropped_face, coords = face_model.predict(batch)
-        landmarks_model.predict(cropped_face)
-        yaw, pitch, roll = headpose_model.predict(cropped_face)
+        left_eye, right_eye, _ = landmarks_model.predict(cropped_face)
+        head_pose_angles = headpose_model.predict(cropped_face)
+        x, y, z = gaze_model.predict(left_eye, right_eye, head_pose_angles)
         break
     feed.close()
 
