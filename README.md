@@ -36,7 +36,9 @@ The flow of data looks like this:
 #### Project Structure
 
 ├── bin
+
 │   └── demo.mp4
+
 ├── graphs
 │   ├── 16
 │   │   ├── inference_time.png
