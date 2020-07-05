@@ -1,12 +1,12 @@
 # Computer Pointer Controller
 
-<img src="https://github.com/yesusbc/Computer-Pointer-Controller-Edge-AI/blob/master/images/computerpointer.jpg" alt="ComputerPointer" width="350" height="400">
+<img src="https://github.com/yesusbc/Computer-Pointer-Controller-Edge-AI/blob/master/images/computerpointer.jpg" alt="ComputerPointer" width="800" height="400">
 
 Third project of the *Udacity's Intel edge AI for IoT developers Nanodegree*, this project will consist of a deep learning pipeline, with the objective of creating an application to control the mouse pointer with the gaze of the user's eyes.
 
 The flow of data looks like this:
 
-<img src="https://github.com/yesusbc/Computer-Pointer-Controller-Edge-AI/blob/master/images/pipeline.png" alt="Pipeline" width="250" height="400">
+<img src="https://github.com/yesusbc/Computer-Pointer-Controller-Edge-AI/blob/master/images/pipeline.png" alt="Pipeline" width="400" height="350">
 
 ## Project Set Up and Installation
 ### Prerequisites
