@@ -34,11 +34,9 @@ The flow of data looks like this:
 *Save models under the 'intel_models' folder.*
 
 #### Project Structure
-
+```
 ├── bin
-
 │   └── demo.mp4
-
 ├── graphs
 │   ├── 16
 │   │   ├── inference_time.png
@@ -52,6 +50,9 @@ The flow of data looks like this:
 │       ├── inference_time.png
 │       ├── io_processing_time.png
 │       └── loading_time.png
+├── images
+│   ├── computerpointer.jpg
+│   └── pipeline.png
 ├── intel_models
 │   ├── face-detection-adas-binary-0001
 │   │   └── FP32-INT1
@@ -91,13 +92,14 @@ The flow of data looks like this:
 ├── README.md
 ├── requirements.txt
 └── src
-    ├── face_detection.py   
-    ├── facial_landmarks_detection.py  
+    ├── face_detection.py
+    ├── facial_landmarks_detection.py
     ├── gaze_estimation.py
-    ├── head_pose_estimation.py    
-    ├── input_feeder.py    
-    ├── main.py    
+    ├── head_pose_estimation.py
+    ├── input_feeder.py
+    ├── main.py
     ├── mouse_controller.py
+```
     
 ## Basic Demo
 ```cd ComputerPointerController/src
