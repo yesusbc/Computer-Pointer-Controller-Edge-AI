@@ -34,7 +34,7 @@ The flow of data looks like this:
 *Save models under the 'intel_models' folder.*
 
 #### Project Structure
-.
+
 ├── bin
 │   └── demo.mp4
 ├── graphs
