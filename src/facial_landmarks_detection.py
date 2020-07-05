@@ -10,16 +10,14 @@ import sys
 import logging as log
 from openvino.inference_engine import IECore
 import cv2
-
-EXTENSIONS_PATH = "/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
-LANDMARKS_MODEL_PATH = "../intel_models/landmarks-regression-retail-0009/FP32/landmarks-regression-retail-0009"
+import time
 
 
 class LandmarksDetectionModel:
     """
     Class for the landmarks Detection Model.
     """
-    def __init__(self, model_path=LANDMARKS_MODEL_PATH, device="CPU", extensions=None):
+    def __init__(self, model_path, device="CPU", extensions=None):
         """
         Set instance variables.
         """
@@ -56,7 +54,7 @@ class LandmarksDetectionModel:
         # Add any necessary extension
         if self.extensions and self.device == "CPU":
             self.ie.add_extension(self.extensions, self.device)
-            self.ie.add_extension(extension_path=EXTENSIONS_PATH, device_name=self.device)
+            self.ie.add_extension(extension_path=self.extensions, device_name=self.device)
 
         # Get the supported layers of the network
         layers_map = self.ie.query_network(network=self.net, device_name=self.device)
@@ -81,7 +79,11 @@ class LandmarksDetectionModel:
         self.w = image.shape[1]
         self.h = image.shape[0]
         p_frame = self.preprocess_input(image)
+
+        start_time = time.time()
         outputs = self.exec_net.infer({self.input_name: p_frame})
+        prediction_time = time.time() - start_time
+
         left_eye, right_eye = self.preprocess_outputs(outputs[self.output_name])
 
         # Left eye coords and cropped image
@@ -102,7 +104,8 @@ class LandmarksDetectionModel:
                       (eyes_coords[0][1][0], eyes_coords[0][1][1]), (255, 0, 0), 2)
         cv2.rectangle(image, (eyes_coords[1][0][0], eyes_coords[1][0][1]),
                       (eyes_coords[1][1][0], eyes_coords[1][1][1]), (255, 0, 0), 2)
-        return cropped_left_eye, cropped_right_eye, eyes_coords
+
+        return cropped_left_eye, cropped_right_eye, eyes_coords, prediction_time
 
     def preprocess_input(self, image):
         """

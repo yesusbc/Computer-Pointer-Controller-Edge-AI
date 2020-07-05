@@ -9,16 +9,14 @@ import sys
 import logging as log
 from openvino.inference_engine import IECore
 import cv2
-
-EXTENSIONS_PATH = "/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
-FACE_MODEL_PATH = "../intel_models/face-detection-adas-binary-0001/FP32-INT1/face-detection-adas-binary-0001"
+import time
 
 
 class FaceDetectionModel:
     """
     Class for the Face Detection Model.
     """
-    def __init__(self, model_path=FACE_MODEL_PATH, device="CPU", extensions=None, threshold=0.60):
+    def __init__(self, model_path, device="CPU", extensions=None, threshold=0.60):
         """
         Set instance variables.
         """
@@ -55,7 +53,7 @@ class FaceDetectionModel:
 
         # Add any necessary extension
         if self.extensions and self.device == "CPU":
-            self.ie.add_extension(extension_path=EXTENSIONS_PATH, device_name=self.device)    # self.extensions
+            self.ie.add_extension(extension_path=self.extensions, device_name=self.device)    # self.extensions
 
         # Get the supported layers of the network
         layers_map = self.ie.query_network(network=self.net, device_name=self.device)
@@ -81,14 +79,18 @@ class FaceDetectionModel:
         self.h = image.shape[0]
 
         p_frame = self.preprocess_input(image)
+
+        start_time = time.time()
         outputs = self.exec_net.infer({self.input_name: p_frame})
+        prediction_time = time.time() - start_time
+
         coords = self.preprocess_outputs(outputs[self.output_name])
         coords = coords[0]
         # cv2.rectangle(image, (coords[0], coords[1]), (coords[2], coords[3]), (255,0,0), 2)
         # cv2.imshow("img",image)
         # cv2.waitKey(0)
         cropped_face = image[coords[1]:coords[3], coords[0]:coords[2]]
-        return cropped_face, coords
+        return cropped_face, coords, prediction_time
 
     def preprocess_input(self, image):
         """

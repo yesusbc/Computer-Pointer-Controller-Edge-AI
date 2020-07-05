@@ -12,17 +12,14 @@ import sys
 import logging as log
 from openvino.inference_engine import IECore
 import cv2
-import math
-
-EXTENSIONS_PATH = "/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
-FACE_MODEL_PATH = "../intel_models/gaze-estimation-adas-0002/FP32/gaze-estimation-adas-0002"
+import time
 
 
 class GazeEstimationModel:
     """
     Class for the Gaze EStimation Model.
     """
-    def __init__(self, model_path=FACE_MODEL_PATH, device="CPU", extensions=None):
+    def __init__(self, model_path, device="CPU", extensions=None):
         """
         Set instance variables.
         """
@@ -57,7 +54,7 @@ class GazeEstimationModel:
         # Add any necessary extension
         if self.extensions and self.device == "CPU":
             self.ie.add_extension(self.extensions, self.device)
-            self.ie.add_extension(extension_path=EXTENSIONS_PATH, device_name=self.device)
+            self.ie.add_extension(extension_path=self.extensions, device_name=self.device)
 
         # Get the supported layers of the network
         layers_map = self.ie.query_network(network=self.net, device_name=self.device)
@@ -81,10 +78,13 @@ class GazeEstimationModel:
         """
         p_left_eye = self.preprocess_input(left_eye)
         p_right_eye = self.preprocess_input(right_eye)
+
+        start_time = time.time()
         outputs = self.exec_net.infer({"head_pose_angles": head_pose_angles,
                                        "left_eye_image": p_left_eye,
                                        "right_eye_image": p_right_eye
                                        })
+        prediction_time = time.time() - start_time
 
         x = round(outputs[self.output_name][0][0], 4)
         y = round(outputs[self.output_name][0][1], 4)
@@ -102,7 +102,7 @@ class GazeEstimationModel:
         new_y_right_eye = int(center_y_right_eye + y*40*-1)
         cv2.line(cropped_face, (center_x_right_eye, center_y_right_eye), (new_x_right_eye, new_y_right_eye), (0, 255, 0), 2)
 
-        return x, y, z
+        return x, y, z, prediction_time
 
     def preprocess_input(self, image):
         """
