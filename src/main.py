@@ -76,7 +76,7 @@ def main(args):
 
     feed.load_data()
     for batch in feed.next_batch():
-        try:
+        # try:
             cropped_face, coords, _ = face_model.predict(batch)
             cv2.rectangle(batch, (coords[0], coords[1]), (coords[2], coords[3]), (255,0,0), 2)
 
@@ -90,9 +90,9 @@ def main(args):
             cv2.imshow("img", batch)
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 break
-        except:
-            print("Frame without prediction. Error: ", sys.exc_info()[0])
-            log.error(sys.exc_info()[0])
+        # except:
+        #     print("Frame without prediction. Error: ", sys.exc_info()[0])
+        #     log.error(sys.exc_info()[0])
     feed.close()
 
 
